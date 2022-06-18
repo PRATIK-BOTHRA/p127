@@ -1,42 +1,36 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from bs4 import BeautifulSoup
-import time
+from bs4 import BeautifulSoup as bs
+import requests
 import pandas as pd
-START_URL = "https://en.wikipedia.org/wiki/List_of_brightest_stars_and_other_record_stars"
-browser = webdriver.Chrome("C:\Users\shristi\Desktop\PRO-C127-Project-Solution-main\chromedriver.exe")
-browser.get(START_URL)
+browser = webdriver.Chrome("chromedriver.exe")
+bright_stars_url = 'https://en.wikipedia.org/wiki/List_of_brightest_stars_and_other_record_stars'
+page = requests.get(bright_stars_url)
+print(page)
+soup = bs(page.text,'html.parser')
 
-time.sleep(10)
+star_table = soup.find('table')
 
-scarped_data = []
-def scrape():  
-        soup = BeautifulSoup(browser.page_source, "html.parser")
-        bright_star_table = soup.find("table", attrs={"class", "wikitable"})
-        table_body = bright_star_table.find('tbody')
-        table_rows = table_body.find_all('tr')
-        for row in table_rows:
-            table_cols = row.find_all('td')            
-            temp_list = []
+temp_list= []
+table_rows = star_table.find_all('tr')
+for tr in table_rows:
+    td = tr.find_all('td')
+    row = [i.text.rstrip() for i in td]
+    temp_list.append(row)
 
-            for col_data in table_cols:
-                data = col_data.text.strip()
-                temp_list.append(data)
-            scarped_data.append(temp_list)
-scrape()
-stars_data = []
-for i in range(0,len(scarped_data)):
-    
-    Star_names = scarped_data[i][1]
-    Distance = scarped_data[i][3]
-    Mass = scarped_data[i][5]
-    Radius = scarped_data[i][6]
-    Lum = scarped_data[i][7]
 
-    required_data = [Star_names, Distance, Mass, Radius, Lum]
-    stars_data.append(required_data)
+Star_names = []
+Distance =[]
+Mass = []
+Radius =[]
+Lum = []
 
-print(stars_data)
-headers = ['Star_name','Distance','Mass','Radius','Luminosity']  
-star_df_1 = pd.DataFrame(stars_data, columns=headers)
-star_df_1.to_csv('scraped_data.csv',index=True, index_label="id")
+for i in range(1,len(temp_list)):
+    Star_names.append(temp_list[i][1])
+    Distance.append(temp_list[i][3])
+    Mass.append(temp_list[i][5])
+    Radius.append(temp_list[i][6])
+    Lum.append(temp_list[i][7])
+headers = ['Star_name','Distance','Mass','Radius','Luminosity']    
+df2 = pd.DataFrame(list(zip(Star_names,Distance,Mass,Radius,Lum)),columns=headers)
+print(df2)
+
+df2.to_csv('bright_stars.csv', index=True, index_label="id")
