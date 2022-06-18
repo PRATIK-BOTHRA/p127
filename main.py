@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup as bs
 import requests
 import pandas as pd
 url = 'https://en.wikipedia.org/wiki/List_of_brown_dwarfs'
+browser = webdriver.Chrome("chromedriver.exe")
+browser.get(START_URL)
 page = requests.get(url)
 soup = bs(page.text,'html.parser')
 star_table = soup.find_all('table', {"class":"wikitable sortable"})
