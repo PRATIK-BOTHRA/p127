@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as bs
 import requests
 import pandas as pd
 browser = webdriver.Chrome("chromedriver.exe")
+browser.get(START_URL)
 bright_stars_url = 'https://en.wikipedia.org/wiki/List_of_brightest_stars_and_other_record_stars'
 page = requests.get(bright_stars_url)
 print(page)
